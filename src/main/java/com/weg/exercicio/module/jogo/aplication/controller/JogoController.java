@@ -2,6 +2,7 @@ package com.weg.exercicio.module.jogo.aplication.controller;
 
 import com.weg.exercicio.module.jogo.aplication.dto.JogoCreateRequestDto;
 import com.weg.exercicio.module.jogo.aplication.dto.JogoResponseDto;
+import com.weg.exercicio.module.jogo.aplication.dto.JogoUpdateRequestDto;
 import com.weg.exercicio.module.jogo.domain.service.JogoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -77,12 +78,38 @@ public class JogoController {
             @ApiResponse(responseCode = "500", description = "Erro interno na API")
     })
     public ResponseEntity<JogoResponseDto> buscarJogoPorId(
+            @Parameter(description = "ID do jogo a ser buscado", example = "1")
             @PathVariable Long id
     ) {
         try {
             var jogo = jogoService.findById(id);
 
             return ResponseEntity.ok(jogo);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    @Operation(
+            summary = "Atualiza dados de um jogo",
+            description = "Atualiza os dados de um jogo à partir do seu ID"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Dados do jogo atualizado com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro no código interno da API"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos na requisição"),
+            @ApiResponse(responseCode = "404", description = "Jogo não encontrado")
+    })
+    public ResponseEntity<JogoResponseDto> atualizarDadosJogo(
+            @Valid @RequestBody JogoUpdateRequestDto jogoUpdateRequest,
+            @Parameter(description = "ID do jogo a ser atualizado", example = "1")
+            @PathVariable Long id
+    ) {
+        try {
+            var novosDadosJogo = jogoService.update(id,jogoUpdateRequest);
+
+            return ResponseEntity.ok(novosDadosJogo);
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }
