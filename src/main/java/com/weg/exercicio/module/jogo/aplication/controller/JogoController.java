@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -60,6 +61,28 @@ public class JogoController {
             var jogos = jogoService.findAll();
 
             return ResponseEntity.ok(jogos);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    @Operation(
+            summary = "Buscar jogo por ID",
+            description = "Mostra as informações do jogo buscado por id"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Jogo encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Jogo não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno na API")
+    })
+    public ResponseEntity<JogoResponseDto> buscarJogoPorId(
+            @PathVariable Long id
+    ) {
+        try {
+            var jogo = jogoService.findById(id);
+
+            return ResponseEntity.ok(jogo);
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }
